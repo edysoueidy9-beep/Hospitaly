@@ -1,0 +1,965 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Soueidy Hospitality Systems</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a kitchen pass. Order tickets (checklists) sit on a deep teal rail; signal yellow marks what needs action. */
+:root {
+  --bg: #F1F5F5;
+  --surface: #FFFFFF;
+  --ink: #0D2B33;
+  --muted: #53686E;
+  --line: #D3DDDE;
+  --deep: #0D2B33;
+  --on-deep: #E8F1F1;
+  --on-deep-muted: #9DB6BB;
+  --accent: #F0B400;
+  --on-accent: #0D2B33;
+  --ok: #17794F;
+  --warn: #9A5B00;
+  --bad: #B3261E;
+  --font-display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #09171C; --surface: #102830; --ink: #E7F0F0; --muted: #95ABB0; --line: #24414A;
+    --deep: #061014; --on-deep: #E8F1F1; --on-deep-muted: #8FA9AE;
+    --accent: #F2BE2E; --ok: #4CC38A; --warn: #F0B35A; --bad: #FF8A80; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #09171C; --surface: #102830; --ink: #E7F0F0; --muted: #95ABB0; --line: #24414A;
+  --deep: #061014; --on-deep: #E8F1F1; --on-deep-muted: #8FA9AE;
+  --accent: #F2BE2E; --ok: #4CC38A; --warn: #F0B35A; --bad: #FF8A80; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.08; margin: 0; text-wrap: balance; letter-spacing: -0.015em; }
+p { margin: 0; }
+a { color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1140px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.mono { font-family: var(--font-mono); }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+section { padding-block: 72px; }
+.sec-head { display: grid; gap: 12px; max-width: 680px; margin-bottom: 36px; }
+.sec-head h2 { font-size: clamp(28px, 4.4vw, 44px); font-weight: 700; }
+.sec-head p { color: var(--muted); font-size: 17px; }
+
+/* Header */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; min-width: 0; }
+.brand-mark { flex: none; width: 30px; height: 30px; border-radius: 6px; background: var(--deep); color: var(--accent); display: grid; place-items: center; }
+.brand span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav { display: flex; align-items: center; gap: 22px; font-size: 14px; font-weight: 500; }
+.nav a { text-decoration: none; color: var(--muted); }
+.nav a:hover { color: var(--ink); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid var(--ink); background: transparent; color: var(--ink); padding: 11px 18px; border-radius: 8px; font-weight: 600; font-size: 15px; text-decoration: none; cursor: pointer; min-height: 44px; }
+.btn:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover { filter: brightness(1.06); background: var(--accent); }
+.btn.small { padding: 7px 12px; font-size: 13px; min-height: 36px; }
+.cart-pill { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; background: var(--deep); color: var(--on-deep) !important; padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; }
+.cart-pill b { background: var(--accent); color: var(--on-accent); border-radius: 999px; min-width: 22px; height: 22px; display: grid; place-items: center; font-size: 12px; padding: 0 6px; }
+@media (max-width: 760px) { .nav a.hide-sm { display: none; } .nav { gap: 12px; } }
+
+/* Hero */
+.hero { padding-block: 56px 72px; }
+.hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 48px; align-items: center; }
+.hero h1 { font-size: clamp(38px, 6.4vw, 72px); font-weight: 800; letter-spacing: -0.03em; }
+.hero h1 em { font-style: normal; background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 92%, transparent 92%); }
+.hero .lede { margin-top: 22px; font-size: 19px; color: var(--muted); max-width: 540px; }
+.hero-actions { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px; }
+.proof { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 10px 26px; font-size: 14px; color: var(--muted); }
+.proof span { display: inline-flex; align-items: center; gap: 8px; }
+.proof svg { color: var(--ok); }
+@media (max-width: 880px) { .hero-grid { grid-template-columns: 1fr; gap: 40px; } }
+
+/* Ticket */
+.ticket { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 22px 22px 26px; box-shadow: 0 18px 40px -22px rgba(13,43,51,0.45); font-family: var(--font-mono); font-size: 13px; transform: rotate(1.2deg); }
+.ticket::before, .ticket::after { content: ""; position: absolute; top: 74px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line); }
+.ticket::before { left: -10px; } .ticket::after { right: -10px; }
+.t-head { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 16px; border-bottom: 2px dashed var(--line); }
+.t-head strong { font-size: 15px; letter-spacing: 0.04em; display: block; }
+.t-head small { color: var(--muted); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+.t-list { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 4px; }
+.t-list label { display: flex; align-items: flex-start; gap: 10px; padding: 8px 6px; border-radius: 6px; cursor: pointer; line-height: 1.35; }
+.t-list label:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.t-list input { appearance: none; flex: none; width: 18px; height: 18px; margin-top: 1px; border: 1.5px solid var(--ink); border-radius: 3px; background: transparent; display: grid; place-items: center; cursor: pointer; }
+.t-list input:checked { background: var(--ok); border-color: var(--ok); }
+.t-list input:checked::after { content: ""; width: 9px; height: 5px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translate(1px,-1px); }
+.t-list input:checked + span { text-decoration: line-through; color: var(--muted); }
+.t-foot { margin-top: 16px; padding-top: 14px; border-top: 2px dashed var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.bar { flex: 1; height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .25s; }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } html { scroll-behavior: auto; } }
+@media (max-width: 880px) { .ticket { transform: none; } }
+
+/* Audience rail */
+.rail { background: var(--deep); color: var(--on-deep); padding-block: 22px; }
+.rail .wrap { display: flex; flex-wrap: wrap; gap: 10px 34px; align-items: center; justify-content: space-between; }
+.rail p { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-deep-muted); }
+.rail ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 26px; font-weight: 600; }
+
+/* Catalog */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.chip { border: 1.5px solid var(--line); background: var(--surface); padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; cursor: pointer; min-height: 40px; }
+.chip[aria-pressed="true"] { background: var(--deep); color: var(--on-deep); border-color: var(--deep); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card.on { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+.tag { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.card h3 { font-size: 20px; font-weight: 700; }
+.card p { color: var(--muted); font-size: 15px; flex: 1; }
+.card-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.price { font-family: var(--font-display); font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; }
+.fmt { font-family: var(--font-mono); font-size: 11px; color: var(--muted); display: block; }
+
+/* Inside the sheets */
+.inside { background: var(--surface); border-block: 1px solid var(--line); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+@media (max-width: 900px) { .two { grid-template-columns: 1fr; } }
+.panel { border: 1px solid var(--line); border-radius: 10px; background: var(--bg); padding: 20px; min-width: 0; }
+.panel h3 { font-size: 20px; margin-bottom: 4px; }
+.panel .sub { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.tab { border: 1px solid var(--line); background: var(--surface); padding: 7px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; min-height: 36px; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.scroll-x { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 480px; background: var(--surface); }
+th { text-align: left; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; background: var(--deep); color: var(--on-deep); padding: 9px 10px; font-weight: 500; white-space: nowrap; }
+td { padding: 9px 10px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+td.num { text-align: right; }
+.note { font-size: 12px; color: var(--muted); margin-top: 10px; }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.fields label { display: grid; gap: 4px; font-size: 12px; font-family: var(--font-mono); color: var(--muted); letter-spacing: 0.04em; }
+input[type=number], input[type=text], input[type=email], select, textarea { width: 100%; background: var(--surface); border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 12px; min-height: 44px; }
+input:focus, textarea:focus, select:focus { border-color: var(--ink); }
+.result { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.result div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px; min-width: 0; }
+.result small { display: block; font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.result b { font-family: var(--font-display); font-size: 22px; font-variant-numeric: tabular-nums; }
+.status { display: inline-block; margin-top: 14px; padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; border: 1.5px solid currentColor; }
+.status.ok { color: var(--ok); } .status.warn { color: var(--warn); } .status.bad { color: var(--bad); }
+
+/* Sectors */
+.sectors { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.sector { padding: 24px 20px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 0 -1px -1px 0; min-width: 0; }
+.sector h3 { font-size: 19px; margin: 10px 0 6px; font-weight: 700; }
+.sector p { color: var(--muted); font-size: 14.5px; }
+.sector svg { color: var(--ink); }
+
+/* Order */
+.order { background: var(--deep); color: var(--on-deep); }
+.order .sec-head p, .order .eyebrow { color: var(--on-deep-muted); }
+.order-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 28px; align-items: start; }
+@media (max-width: 900px) { .order-grid { grid-template-columns: 1fr; } }
+.slip { background: var(--surface); color: var(--ink); border-radius: 8px; padding: 22px; min-width: 0; }
+.slip h3 { font-size: 22px; margin-bottom: 14px; }
+.lines { list-style: none; margin: 0; padding: 0; font-family: var(--font-mono); font-size: 13px; min-height: 44px; }
+.lines li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+.lines li button { background: none; border: 0; cursor: pointer; color: var(--muted); text-align: left; padding: 0; text-decoration: underline; font: inherit; }
+.empty { color: var(--muted); font-family: var(--font-body); font-size: 15px; display: block; padding: 8px 0; border: 0 !important; }
+.sums { margin-top: 14px; display: grid; gap: 6px; font-variant-numeric: tabular-nums; }
+.sums div { display: flex; justify-content: space-between; gap: 12px; }
+.sums .total { font-family: var(--font-display); font-weight: 800; font-size: 28px; padding-top: 10px; border-top: 2px solid var(--ink); margin-top: 6px; }
+.nudge { margin-top: 12px; font-size: 14px; color: var(--muted); }
+.pay { background: color-mix(in srgb, var(--on-deep) 8%, transparent); border: 1px solid color-mix(in srgb, var(--on-deep) 22%, transparent); border-radius: 8px; padding: 22px; min-width: 0; }
+.pay h3 { font-size: 22px; margin-bottom: 14px; }
+.steps { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 14px; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 32px 1fr; gap: 12px; }
+.steps li::before { content: counter(s); width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-weight: 700; font-family: var(--font-mono); }
+.steps p { color: var(--on-deep-muted); font-size: 15px; }
+.steps strong { color: var(--on-deep); display: block; }
+.wish { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--deep); border: 1.5px dashed var(--accent); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; }
+.wish small { display: block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-deep-muted); }
+.wish b { font-family: var(--font-mono); font-size: clamp(22px, 5vw, 30px); letter-spacing: 0.08em; user-select: all; }
+.order .btn { border-color: var(--on-deep); color: var(--on-deep); }
+.order .btn:hover { background: color-mix(in srgb, var(--on-deep) 14%, transparent); }
+.order .btn.primary { border-color: var(--accent); color: var(--on-accent); }
+.slip .fields { margin: 16px 0 0; }
+.slip .fields label { color: var(--muted); }
+.slip textarea { margin-top: 14px; font-family: var(--font-mono); font-size: 12.5px; min-height: 150px; resize: vertical; }
+.slip .btn { margin-top: 12px; border-color: var(--ink); color: var(--ink); }
+.slip .btn.primary { color: var(--on-accent); border-color: var(--accent); }
+.copied { margin-left: 10px; font-size: 13px; color: var(--ok); font-weight: 600; }
+
+/* Bundles / enterprise */
+.tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.tier { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 18px; }
+.tier b { font-family: var(--font-display); font-size: 30px; display: block; }
+.tier span { color: var(--muted); font-size: 14px; }
+.enterprise { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; background: var(--accent); color: var(--on-accent); border-radius: 10px; padding: 26px; }
+.enterprise h3 { font-size: 26px; margin-bottom: 6px; }
+.enterprise p { max-width: 640px; }
+.enterprise .btn { border-color: var(--on-accent); color: var(--on-accent); background: transparent; }
+.enterprise .btn:hover { background: color-mix(in srgb, var(--on-accent) 12%, transparent); }
+
+/* About */
+.about { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 48px; align-items: start; }
+@media (max-width: 860px) { .about { grid-template-columns: 1fr; gap: 28px; } }
+.years { font-family: var(--font-display); font-weight: 800; font-size: clamp(110px, 20vw, 220px); line-height: 0.85; letter-spacing: -0.05em; }
+.years small { display: block; font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-top: 14px; letter-spacing: 0.1em; }
+.about p { font-size: 18px; margin-bottom: 16px; max-width: 620px; }
+.about p.muted { color: var(--muted); font-size: 16px; }
+.secure { margin-top: 26px; display: grid; gap: 10px; }
+.secure div { display: grid; grid-template-columns: 22px 1fr; gap: 10px; font-size: 15px; color: var(--muted); }
+.secure svg { color: var(--ok); margin-top: 2px; }
+
+/* FAQ */
+details { border-bottom: 1px solid var(--line); padding: 4px 0; }
+summary { cursor: pointer; font-weight: 600; font-size: 17px; padding: 14px 0; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font-family: var(--font-mono); font-size: 20px; color: var(--muted); }
+details[open] summary::after { content: "−"; }
+details p { color: var(--muted); padding: 0 0 16px; max-width: 700px; }
+.faq { max-width: 780px; }
+
+/* Contact */
+.contact { background: var(--surface); border-top: 1px solid var(--line); }
+.contact-box { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; }
+@media (max-width: 760px) { .contact-box { grid-template-columns: 1fr; } }
+.email { font-family: var(--font-mono); font-size: clamp(15px, 4.6vw, 24px); font-weight: 500; user-select: all; word-break: break-all; }
+footer { padding-block: 28px; font-size: 13px; color: var(--muted); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+
+/* Illustrations */
+.ol { stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.ill-ink { fill: var(--ink); } .ill-acc { fill: var(--accent); } .ill-surf { fill: var(--surface); }
+.ill-line { fill: var(--line); } .ill-deep { fill: var(--deep); } .ill-ok { fill: var(--ok); }
+.st { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.5; }
+.st-ink { stroke: var(--ink); } .st-mute { stroke: var(--muted); } .st-ok { stroke: var(--ok); } .st-acc { stroke: var(--accent); }
+.thumb { height: 120px; border-radius: 8px; background: color-mix(in srgb, var(--accent) 16%, var(--bg)); display: flex; align-items: flex-end; justify-content: center; overflow: hidden; padding-top: 14px; }
+.paper { width: 78%; height: 100%; background: var(--surface); border: 1px solid var(--line); border-bottom: 0; border-radius: 6px 6px 0 0; box-shadow: 0 10px 20px -12px rgba(13,43,51,0.6); padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.paper b { font-family: var(--font-display); font-size: 14px; line-height: 1.12; font-weight: 700; }
+.paper i { flex: 1; border-radius: 3px; background-image: repeating-linear-gradient(var(--line) 0 2px, transparent 2px 10px); }
+.thumb.sheet .paper b { background: var(--deep); color: var(--on-deep); padding: 5px 7px; border-radius: 3px; font-family: var(--font-mono); font-size: 11px; font-weight: 500; }
+.thumb.sheet .paper i { background-image: repeating-linear-gradient(var(--line) 0 1px, transparent 1px 13px), repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 38px); }
+.thumb.slide { padding-top: 12px; }
+.thumb.slide .paper { width: 74%; height: 100%; background: var(--deep); color: var(--on-deep); border-color: var(--deep); border-left: 8px solid var(--accent); justify-content: center; gap: 10px; }
+.thumb.slide .paper b { font-size: 17px; }
+.thumb.slide .paper i { flex: none; height: 26px; width: 60%; background-image: repeating-linear-gradient(color-mix(in srgb, var(--on-deep) 35%, transparent) 0 2px, transparent 2px 9px); }
+.thumb.app .paper { width: 40%; border-radius: 14px 14px 0 0; border: 2px solid var(--ink); border-bottom: 0; align-items: center; text-align: center; }
+.thumb.app .paper i { align-self: stretch; }
+.thumb.doc .paper { width: 58%; }
+.samplegrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: start; }
+.samplegrid .panel { background: var(--surface); }
+.samplegrid .fields { grid-template-columns: 1fr 1fr; }
+.samplegrid td.ok { color: var(--ok); font-weight: 700; } .samplegrid td.bad { color: var(--bad); font-weight: 700; }
+.slides { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+.sl { aspect-ratio: 16 / 9; background: var(--deep); color: var(--on-deep); border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--on-deep) 18%, transparent); min-width: 0; }
+.sl small { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--on-deep-muted); }
+.sl h3 { font-size: 21px; font-weight: 700; color: var(--on-deep); }
+.sl .row { display: flex; flex-wrap: wrap; gap: 6px; }
+.sl .row span { background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 13px; padding: 6px 10px; border-radius: 5px; }
+.sl .row span.alt { background: transparent; color: var(--on-deep); border: 1px solid color-mix(in srgb, var(--on-deep) 40%, transparent); font-weight: 500; }
+.sl ol { margin: 0; padding-left: 20px; font-size: 13.5px; display: grid; gap: 2px; color: var(--on-deep); }
+.sl .stack { display: flex; height: 34px; border-radius: 5px; overflow: hidden; font-family: var(--font-mono); font-size: 11px; color: var(--on-accent); }
+.sl .stack span { display: grid; place-items: center; min-width: 0; overflow: hidden; }
+.custom { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 32px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 32px; }
+@media (max-width: 860px) { .custom { grid-template-columns: 1fr; padding: 22px; } }
+.custom h2 { font-size: clamp(26px, 4vw, 38px); font-weight: 700; margin: 10px 0 14px; }
+.custom p { color: var(--muted); max-width: 560px; }
+.custom ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.custom li { display: flex; gap: 10px; align-items: flex-start; font-weight: 500; }
+.custom li svg { flex: none; color: var(--ok); margin-top: 3px; }
+.day { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+@media (max-width: 1040px) { .day { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { .day { grid-template-columns: 1fr; } }
+.stage { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.stage .n { font-family: var(--font-mono); font-size: 12px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+.stage h3 { font-size: 22px; font-weight: 700; }
+.stage ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; font-size: 14px; color: var(--muted); }
+.stage li { padding-left: 14px; position: relative; }
+.stage li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.badge { width: 52px; height: 52px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; }
+.sector .badge svg { color: var(--on-accent); }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-daily" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M9 6h11M9 12h11M9 18h11M3.5 6l1 1 2-2M3.5 12l1 1 2-2M3.5 18l1 1 2-2"/></symbol>
+    <symbol id="i-foh" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 18h16M5 18a7 7 0 0114 0M12 8V6m-2 0h4"/></symbol>
+    <symbol id="i-boh" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M5 11h14v6a3 3 0 01-3 3H8a3 3 0 01-3-3zM3 11h2m14 0h2M9 7c0-1.5 1-1.5 1-3m4 3c0-1.5 1-1.5 1-3"/></symbol>
+    <symbol id="i-stock" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 20V10m6 10V4m6 16v-7m4 7H2"/></symbol>
+    <symbol id="i-people" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0112 0M17 5a3 3 0 010 6M21 20a5 5 0 00-4-4.9"/></g></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6zM8.5 12l2.5 2.5L15.5 10"/></symbol>
+    <symbol id="i-hotel" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 21V5a1 1 0 011-1h9a1 1 0 011 1v16M15 10h4a1 1 0 011 1v10M2 21h20M8 8h3M8 12h3M8 16h3"/></symbol>
+    <symbol id="i-plate" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/></g></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10"/></symbol>
+    <symbol id="i-cross" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></symbol>
+    <symbol id="i-truck" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M2 6h12v10H2zM14 10h4l4 3v3h-8M6.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM17.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></symbol>
+  </defs>
+</svg>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-safety" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 3c3 4 6 7 6 11a6 6 0 01-12 0c0-4 3-7 6-11zM9.5 14.5a2.5 2.5 0 002.5 2.5"/></symbol>
+    <symbol id="i-sops" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 6c-2-1.5-5-2-8-1.5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-13C17 4 14 4.5 12 6zM12 6v13"/></symbol>
+    <symbol id="i-manuals" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M5 4h11a2 2 0 012 2v14H7a2 2 0 01-2-2zM9 4v16M12 9h3M12 13h3"/></symbol>
+    <symbol id="i-training" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 4h18v12H3zM12 16v4M8 20h8M7 12l3-3 2 2 4-4"/></symbol>
+    <symbol id="i-money" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.5 9.2c-.6-.8-1.5-1.2-2.5-1.2-1.4 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1.1 2-2.5 2c-1 0-1.9-.4-2.5-1.2M12 6.5V8m0 8v1.5"/></g></symbol>
+
+  </defs>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Soueidy Hospitality Systems, home">
+      <div class="brand-mark"><svg width="18" height="18"><use href="#i-daily"/></svg></div>
+      <span>Soueidy Hospitality Systems</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="hide-sm" href="#systems">Systems</a>
+      <a class="hide-sm" href="#trainings">Trainings</a>
+      <a class="hide-sm" href="#about">About</a>
+      <a class="hide-sm" href="#contact">Contact</a>
+      <a class="cart-pill" href="#order">Order <b id="cartCount">0</b></a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Operating systems for food &amp; beverage and hospitality</p>
+        <h1 style="margin-top:16px">Every shift, run from <em>the same page.</em></h1>
+        <p class="lede">Ready-to-use checklists, FOH and BOH manuals, delivery systems in Excel, stock control, payroll, attendance and fully designed PowerPoint trainings. Built from 24 years of leading large hospitality teams, delivered to your inbox anywhere in the world.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#systems">Choose your systems</a>
+          <a class="btn" href="#order">How to order</a>
+        </div>
+        <div class="proof">
+          <span><svg width="18" height="18"><use href="#i-check"/></svg>38 systems, mix and match</span>
+          <span><svg width="18" height="18"><use href="#i-check"/></svg>Worldwide, by email</span>
+          <span><svg width="18" height="18"><use href="#i-check"/></svg>Prices in USD</span>
+        </div>
+      </div>
+
+      <aside class="ticket" aria-label="Sample opening checklist you can tick">
+        <div class="t-head">
+          <div><strong>OPENING / KITCHEN + FLOOR</strong><small>Sample from the Opening Pack</small></div>
+          <div style="text-align:right"><small>Date</small><strong id="tDate" style="font-size:13px">&nbsp;</strong></div>
+        </div>
+        <ul class="t-list" id="tList"></ul>
+        <div class="t-foot">
+          <div class="bar" aria-hidden="true"><i id="tBar"></i></div>
+          <strong id="tCount">0 / 0</strong>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <div class="rail">
+    <div class="wrap">
+      <p>Made for</p>
+      <ul>
+        <li>5-star hotels</li><li>Restaurants</li><li>Central kitchens</li><li>Hospital kitchens</li><li>Catering companies</li>
+      </ul>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">A day, end to end</p>
+        <h2>Six moments in the day. Every one covered.</h2>
+        <p>From the first key in the door to the last count of the night, there is a system for each step.</p>
+      </div>
+      <div class="day">
+        <div class="stage"><span class="badge"><svg width="26" height="26" style="color:var(--on-accent)"><use href="#i-daily"/></svg></span><span class="n">1 · Morning</span><h3>Open</h3><ul><li>Opening Pack</li><li>Schedule Formats</li><li>Reservation Sheets</li></ul></div>
+        <div class="stage"><span class="badge"><svg width="26" height="26" style="color:var(--on-accent)"><use href="#i-boh"/></svg></span><span class="n">2 · Before service</span><h3>Prep</h3><ul><li>BOH Kitchen Pack</li><li>Food Washing Process</li><li>Kitchen SOPs</li></ul></div>
+        <div class="stage"><span class="badge"><svg width="26" height="26" style="color:var(--on-accent)"><use href="#i-foh"/></svg></span><span class="n">3 · Service</span><h3>Serve</h3><ul><li>FOH Service Standards</li><li>Bartender and Barista SOPs</li><li>Guest CRM Sheet</li></ul></div>
+        <div class="stage"><span class="badge"><svg width="26" height="26" style="color:var(--on-accent)"><use href="#i-safety"/></svg></span><span class="n">4 · Between shifts</span><h3>Clean</h3><ul><li>Cleaning Schedules</li><li>Deep Cleaning Schedules</li><li>Food Safety Sheets</li></ul></div>
+        <div class="stage"><span class="badge"><svg width="26" height="26" style="color:var(--on-accent)"><use href="#i-money"/></svg></span><span class="n">5 · Closing</span><h3>Close</h3><ul><li>Changeover Pack</li><li>Cash Drawer Closing</li><li>Tip Distribution</li></ul></div>
+        <div class="stage"><span class="badge"><svg width="26" height="26" style="color:var(--on-accent)"><use href="#i-stock"/></svg></span><span class="n">6 · Back office</span><h3>Control</h3><ul><li>Waste and Stock Variance</li><li>Supplier Sheet</li><li>Payroll and Attendance</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="systems" style="padding-top:24px">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">The catalogue</p>
+        <h2>Thirty-eight systems. Take one, or take the lot.</h2>
+        <p>Each system is a finished working file set up with your property name. Add what you need to your order, and the discount grows as the list does.</p>
+      </div>
+      <div class="filters" id="filters" role="group" aria-label="Filter systems"></div>
+      <div class="grid" id="catalog"></div>
+    </div>
+  </section>
+
+  <section class="inside" id="inside">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Look inside</p>
+        <h2>Sheets your team can fill in on day one.</h2>
+        <p>Plain columns, clear headings and the checks a manager actually reviews. These samples use made-up figures.</p>
+      </div>
+      <div class="two">
+        <div class="panel">
+          <h3>Sheet preview</h3>
+          <p class="sub">Pick a sheet to see its layout.</p>
+          <div class="tabs" role="tablist" id="tabs"></div>
+          <div class="scroll-x" id="sheet"></div>
+          <p class="note">Sample rows only. Your copy is blank and carries your logo.</p>
+        </div>
+        <div class="panel">
+          <h3>Stock variance, worked out</h3>
+          <p class="sub">Change the figures. This is the check in the Stock Variance workbook.</p>
+          <div class="fields">
+            <label for="v-open">Opening stock (kg)<input id="v-open" type="number" inputmode="decimal" value="40"></label>
+            <label for="v-buy">Purchases (kg)<input id="v-buy" type="number" inputmode="decimal" value="120"></label>
+            <label for="v-close">Closing count (kg)<input id="v-close" type="number" inputmode="decimal" value="35"></label>
+            <label for="v-theo">Expected use from sales (kg)<input id="v-theo" type="number" inputmode="decimal" value="118"></label>
+            <label for="v-cost" style="grid-column:1/-1">Cost per kg (USD)<input id="v-cost" type="number" inputmode="decimal" value="6"></label>
+          </div>
+          <div class="result">
+            <div><small>Actual use</small><b id="r-act">0</b></div>
+            <div><small>Variance</small><b id="r-var">0</b></div>
+            <div><small>Cost</small><b id="r-cost">0</b></div>
+          </div>
+          <span class="status ok" id="r-status">On target</span>
+          <p class="note">Actual use = opening + purchases − closing count. Variance is measured against what sales say you should have used.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="samples" style="padding-bottom:24px">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Free samples</p>
+        <h2>Try three of the systems right here.</h2>
+        <p>These work like the real sheets. Change the numbers and see the result. Want the full sample files by email? Ask below.</p>
+      </div>
+      <div class="samplegrid">
+        <div class="panel">
+          <h3>Cash drawer closing</h3>
+          <p class="sub">Count the notes, compare with the POS.</p>
+          <div class="fields">
+            <label for="c-100">$100 notes<input id="c-100" type="number" inputmode="numeric" min="0" value="3"></label>
+            <label for="c-50">$50 notes<input id="c-50" type="number" inputmode="numeric" min="0" value="4"></label>
+            <label for="c-20">$20 notes<input id="c-20" type="number" inputmode="numeric" min="0" value="10"></label>
+            <label for="c-10">$10 notes<input id="c-10" type="number" inputmode="numeric" min="0" value="6"></label>
+            <label for="c-5">$5 notes<input id="c-5" type="number" inputmode="numeric" min="0" value="8"></label>
+            <label for="c-1">$1 notes<input id="c-1" type="number" inputmode="numeric" min="0" value="15"></label>
+            <label for="c-pos" style="grid-column:1/-1">POS cash sales (USD)<input id="c-pos" type="number" inputmode="decimal" value="812"></label>
+          </div>
+          <div class="result">
+            <div><small>Counted</small><b id="c-total">0</b></div>
+            <div><small>POS</small><b id="c-posout">0</b></div>
+            <div><small>Over / short</small><b id="c-diff">0</b></div>
+          </div>
+          <span class="status ok" id="c-status">Balanced</span>
+        </div>
+
+        <div class="panel">
+          <h3>Tip distribution</h3>
+          <p class="sub">Split the pool by group. Shares must add to 100.</p>
+          <div class="fields">
+            <label for="tip-pool" style="grid-column:1/-1">Tip pool (USD)<input id="tip-pool" type="number" inputmode="decimal" value="480"></label>
+            <label for="tip-1">Waiters share %<input id="tip-1" type="number" inputmode="decimal" value="60"></label>
+            <label for="tip-2">Runners share %<input id="tip-2" type="number" inputmode="decimal" value="20"></label>
+            <label for="tip-3">Kitchen share %<input id="tip-3" type="number" inputmode="decimal" value="15"></label>
+            <label for="tip-4">Cleaning share %<input id="tip-4" type="number" inputmode="decimal" value="5"></label>
+          </div>
+          <div class="scroll-x"><table style="min-width:0"><tbody id="tip-out"></tbody></table></div>
+          <span class="status ok" id="tip-status">Shares add to 100</span>
+        </div>
+
+        <div class="panel">
+          <h3>Temperature log</h3>
+          <p class="sub">Add a reading. The sheet flags it for you.</p>
+          <div class="fields">
+            <label for="tp-unit">Unit<select id="tp-unit"><option value="chiller">Chiller (0 to 4 °C)</option><option value="freezer">Freezer (−18 °C or colder)</option></select></label>
+            <label for="tp-val">Reading (°C)<input id="tp-val" type="number" inputmode="decimal" step="0.1" value="3.2"></label>
+          </div>
+          <button class="btn primary small" id="tp-add" type="button">Add reading</button>
+          <div class="scroll-x" style="margin-top:14px"><table style="min-width:0"><thead><tr><th>Unit</th><th>Reading</th><th>Status</th></tr></thead><tbody id="tp-rows"></tbody></table></div>
+        </div>
+      </div>
+      <div style="margin-top:22px"><a class="btn" href="mailto:Edysoueidy68@gmail.com?subject=Free%20sample%20request">Ask for the full sample files</a></div>
+    </div>
+  </section>
+
+  <section id="trainings">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">PowerPoint trainings</p>
+        <h2>Designed decks, ready to present on day one.</h2>
+        <p>Ten training topics covering fire safety, fine dining service, food hygiene, selling, listening, P&amp;L, purchasing and menus. Every deck has speaker notes and a short quiz. A few sample slides:</p>
+      </div>
+      <div class="slides">
+        <div class="sl"><small>Fire safety</small><h3>If there is a fire, think RACE</h3><div class="row"><span>Rescue</span><span>Alarm</span><span>Contain</span><span>Extinguish</span></div><div class="row"><span class="alt">Pull</span><span class="alt">Aim</span><span class="alt">Squeeze</span><span class="alt">Sweep</span></div></div>
+        <div class="sl"><small>Fine dining service steps</small><h3>The guest journey, table side</h3><ol style="columns:2"><li>Greet</li><li>Seat</li><li>Water and bread</li><li>Take the order</li><li>Serve</li><li>Check back</li><li>Clear</li><li>Farewell</li></ol></div>
+        <div class="sl"><small>Basic food hygiene</small><h3>Wash your hands, every time</h3><ol><li>Wet hands with warm water</li><li>Apply soap and scrub for 20 seconds</li><li>Rinse, then dry with a single-use towel</li></ol></div>
+        <div class="sl"><small>P&amp;L skills</small><h3>Where each dollar of sales goes</h3><div class="stack" role="img" aria-label="Example split: food 30, labour 30, other costs 25, profit 15 percent"><span style="width:30%;background:var(--accent)">Food 30</span><span style="width:30%;background:#8FC1C9">Labour 30</span><span style="width:25%;background:#B9CED1">Other 25</span><span style="width:15%;background:var(--ok);color:#fff">Profit 15</span></div><small>Example figures, set your own targets</small></div>
+        <div class="sl"><small>Phone selling skills</small><h3>Win the booking in the first 30 seconds</h3><ol><li>Answer warmly and name the venue</li><li>Ask for date, time and guests</li><li>Suggest a table or a set menu</li></ol></div>
+        <div class="sl"><small>Listening skills</small><h3>Listen to understand, not to reply</h3><div class="row"><span>Pause</span><span>Paraphrase</span><span>Ask</span><span>Confirm</span></div></div>
+      </div>
+      <p class="note">Sample slides. Your deck carries your property name, logo and colours.</p>
+    </div>
+  </section>
+
+  <section style="padding-top:8px">
+    <div class="wrap">
+      <div class="custom">
+        <div>
+          <p class="eyebrow">Written for your property</p>
+          <h2>Need a manual that does not exist yet? We write it.</h2>
+          <p>Send your menu, floor plan and standards. You receive a manual in your brand, ready to print, train from and audit against.</p>
+          <div style="margin-top:22px"><a class="btn primary" href="mailto:Edysoueidy68@gmail.com?subject=Custom%20manual%20request">Request a custom manual</a></div>
+        </div>
+        <ul>
+          <li><svg width="20" height="20"><use href="#i-check"/></svg>FOH and BOH manuals</li>
+          <li><svg width="20" height="20"><use href="#i-check"/></svg>Delivery operations systems in Excel</li>
+          <li><svg width="20" height="20"><use href="#i-check"/></svg>Any SOP: bar, kitchen, café, banquet, housekeeping</li>
+          <li><svg width="20" height="20"><use href="#i-check"/></svg>Any food and beverage training as a designed PowerPoint</li>
+          <li><svg width="20" height="20"><use href="#i-check"/></svg>Fine dining and five-star service standards</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Where it fits</p>
+        <h2>One method, any size of kitchen.</h2>
+        <p>The same discipline applies whether you serve 40 covers or 4,000 trays.</p>
+      </div>
+      <div class="sectors">
+        <div class="sector"><span class="badge"><svg width="28" height="28"><use href="#i-hotel"/></svg></span><h3>Five-star hotels</h3><p>Service standards, reservations, guest records and handovers between shifts and departments.</p></div>
+        <div class="sector"><span class="badge"><svg width="28" height="28"><use href="#i-plate"/></svg></span><h3>Restaurants and cafés</h3><p>Opening, cash closing, tips, bar and barista SOPs and weekly schedules in one routine.</p></div>
+        <div class="sector"><span class="badge"><svg width="28" height="28"><use href="#i-truck"/></svg></span><h3>Central kitchens</h3><p>Branch ordering sheets, supplier lists, barcoded items and stock variance by outlet.</p></div>
+        <div class="sector"><span class="badge"><svg width="28" height="28"><use href="#i-cross"/></svg></span><h3>Hospital kitchens</h3><p>Food safety records, deep cleaning schedules and attendance for teams working around the clock.</p></div>
+        <div class="sector"><span class="badge"><svg width="28" height="28"><use href="#i-box"/></svg></span><h3>Catering companies</h3><p>Event ordering, prep lists, food washing process and payroll for variable teams.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="order" id="order">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Order</p>
+        <h2>Build your order, pay with Wish Money, receive by email.</h2>
+        <p>Pick systems in the catalogue above. Your list and total appear here.</p>
+      </div>
+      <div class="order-grid">
+        <div class="slip">
+          <h3>Your order</h3>
+          <ul class="lines" id="lines"></ul>
+          <div class="sums">
+            <div><span>Subtotal</span><span id="sSub">$0</span></div>
+            <div><span id="sDiscLabel">Volume discount</span><span id="sDisc">−$0</span></div>
+            <div class="total"><span>Total</span><span id="sTotal">$0</span></div>
+          </div>
+          <p class="nudge" id="nudge"></p>
+          <div class="fields">
+            <label for="f-name">Your name<input id="f-name" type="text" autocomplete="name"></label>
+            <label for="f-co">Property or company<input id="f-co" type="text" autocomplete="organization"></label>
+            <label for="f-country" style="grid-column:1/-1">Country<input id="f-country" type="text" autocomplete="country-name"></label>
+          </div>
+          <textarea id="summary" readonly aria-label="Order summary to paste into your email"></textarea>
+          <button class="btn primary" id="copySummary" type="button">Copy order summary</button><span class="copied" id="copiedMsg" hidden>Copied</span>
+        </div>
+
+        <div class="pay">
+          <h3>How to pay</h3>
+          <ol class="steps">
+            <li><div><strong>Send the total by Wish Money</strong><p>Transfer the amount to the number below. Use this number only.</p></div></li>
+            <li><div><strong>Email your receipt</strong><p>Send a screenshot of the payment and your order summary to the address below.</p></div></li>
+            <li><div><strong>Receive your files</strong><p>Your systems arrive by email once the payment is confirmed.</p></div></li>
+          </ol>
+          <div class="wish">
+            <div><small>Wish Money number</small><b id="wishNum">70102357</b></div>
+            <button class="btn small" id="copyWish" type="button">Copy number</button>
+          </div>
+          <div class="wish" style="border-style:solid;border-color:color-mix(in srgb, var(--on-deep) 30%, transparent)">
+            <div style="min-width:0"><small>Send receipt to</small><b style="font-size:16px;letter-spacing:0;word-break:break-all">Edysoueidy68@gmail.com</b></div>
+            <button class="btn small" id="copyMail" type="button">Copy email</button>
+          </div>
+          <p style="font-size:14px;color:var(--on-deep-muted)">Outside Lebanon and unsure how to send with Wish Money? Email first and we will arrange the payment together.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Volume pricing</p>
+        <h2>The more you take, the less each system costs.</h2>
+      </div>
+      <div class="tiers">
+        <div class="tier"><b>10% off</b><span>3 to 5 systems</span></div>
+        <div class="tier"><b>15% off</b><span>6 to 9 systems</span></div>
+        <div class="tier"><b>25% off</b><span>10 to 17 systems</span></div>
+        <div class="tier"><b>30% off</b><span>18 to 27 systems</span></div>
+        <div class="tier"><b>35% off</b><span>28 or more, up to the full set</span></div>
+      </div>
+      <div class="enterprise">
+        <div>
+          <h3>Large properties and groups</h3>
+          <p>Hotel groups, central kitchens, hospital catering and multi-branch operators get a custom quote with special offers, branch-by-branch setup and training for your managers.</p>
+        </div>
+        <a class="btn" href="mailto:Edysoueidy68@gmail.com?subject=Group%20quote%20request">Request a group quote</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" style="padding-top:24px">
+    <div class="wrap about">
+      <div class="years">24<small>years in hospitality management</small></div>
+      <div>
+        <p class="eyebrow" style="margin-bottom:14px">About</p>
+        <p>These systems come from 24 years of running food and beverage and hospitality operations, and leading large teams through every part of the day: opening, service, handover, closing, and the numbers that follow.</p>
+        <p class="muted">Every sheet here exists because a manager needed it on a busy shift. They are short on purpose, clear for new staff, and built so an owner or auditor can follow what happened.</p>
+        <div class="secure">
+          <div><svg width="20" height="20"><use href="#i-shield"/></svg><span>No account, no card details and no customer data stored on this site. Payment happens inside your own Wish Money app.</span></div>
+          <div><svg width="20" height="20"><use href="#i-shield"/></svg><span>Only pay to the Wish Money number shown on this page, and only confirm orders by email with Edysoueidy68@gmail.com.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:24px">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Questions</p><h2>Before you order</h2></div>
+      <div class="faq">
+        <details><summary>What file types do I receive?</summary><p>Spreadsheet packs come as Excel files with a printable PDF. SOPs and the food washing process come as Word and PDF so you can edit and print them. The training presentation is a PowerPoint deck. The attendance app is delivered as a web app link with set-up notes.</p></details>
+        <details><summary>Can the sheets carry my property name and logo?</summary><p>Yes. Send your name and logo with your payment receipt and each pack is set up for you.</p></details>
+        <details><summary>How do I pay?</summary><p>By Wish Money to 70102357. Then email the payment screenshot and your order summary to Edysoueidy68@gmail.com.</p></details>
+        <details><summary>Do you write custom manuals and trainings?</summary><p>Yes. FOH and BOH manuals, delivery operations systems, SOPs and any food and beverage training can be written for your property. Email what you need for a quote.</p></details>
+        <details><summary>Can the systems be adapted to our operation?</summary><p>Yes. For a central kitchen with several branches, or a hospital with strict records, email your outlets and workflow and you will get a custom quote.</p></details>
+        <details><summary>Do you offer discounts for big properties?</summary><p>Yes. Volume discounts apply automatically in the order list, and groups get a separate offer. Use the group quote button above.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap contact-box">
+      <div>
+        <p class="eyebrow">Contact</p>
+        <h2 style="font-size:clamp(28px,4.4vw,40px);margin:10px 0 14px">Tell me about your property.</h2>
+        <p class="email" id="emailText">Edysoueidy68@gmail.com</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" id="copyMail2" type="button">Copy email</button>
+        <a class="btn primary" href="mailto:Edysoueidy68@gmail.com?subject=Hospitality%20systems%20enquiry">Write an email</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© Soueidy Hospitality Systems. All prices in US dollars.</span>
+    <span>Worldwide delivery by email.</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var AREAS = { daily: "Daily operations", foh: "Front of house", boh: "Back of house", manuals: "Manuals and systems", training: "PowerPoint trainings", safety: "Cleaning and food safety", sops: "SOPs", stock: "Stock control", money: "Cash, tips and suppliers", people: "Staff and payroll" };
+  function kindOf(f) { return /^PowerPoint/.test(f) ? "slide" : /^Excel|^Word \+ Excel/.test(f) ? "sheet" : /^Web/.test(f) ? "app" : "doc"; }
+  var ITEMS = [
+    { id: "opening", area: "daily", name: "Opening Pack", desc: "Kitchen and floor opening checklists with fridge and freezer temperature logs, equipment checks and cash float.", fmt: "Excel + PDF", price: 19 },
+    { id: "change", area: "daily", name: "Changeover Pack", desc: "Shift handover log and the changeover routine between services, with sign-off for each station.", fmt: "Excel + PDF", price: 15 },
+    { id: "foh", area: "foh", name: "FOH Service Standards", desc: "Floor checklists, section set-up, service steps and a manager walk-round sheet.", fmt: "Excel + PDF", price: 25 },
+    { id: "crm", area: "foh", name: "Guest CRM Sheet", desc: "Guest profiles, preferences, birthdays, visit history and follow-up reminders.", fmt: "Excel", price: 29 },
+    { id: "boh", area: "boh", name: "BOH Kitchen Pack", desc: "Prep lists, par levels, line checks and station cleaning schedules.", fmt: "Excel + PDF", price: 25 },
+    { id: "meal", area: "boh", name: "Staff Meal Sheet", desc: "Plan the staff meal, record portions and cost, and keep it inside budget.", fmt: "Excel", price: 12 },
+    { id: "ck", area: "boh", name: "Central Kitchen Ordering", desc: "Branch order sheet, production totals and dispatch list for a central kitchen.", fmt: "Excel", price: 39 },
+    { id: "waste", area: "stock", name: "Waste Management Sheet", desc: "Log waste by item, quantity and reason, with daily and weekly cost totals.", fmt: "Excel + PDF", price: 15 },
+    { id: "barcode", area: "stock", name: "Barcoded Item Sheets", desc: "Item lists with barcode columns for fast receiving, counting and issuing.", fmt: "Excel", price: 29 },
+    { id: "variance", area: "stock", name: "Stock Variance Workbook", desc: "Opening, purchases, closing and expected use, with variance flagged by item.", fmt: "Excel", price: 35 },
+    { id: "schedule", area: "people", name: "Schedule Formats", desc: "Weekly rosters by department with hours totals and coverage by shift.", fmt: "Excel + PDF", price: 19 },
+    { id: "payroll", area: "people", name: "Electronic Payroll Sheet", desc: "Hours, overtime, allowances and deductions calculated per employee.", fmt: "Excel", price: 35 },
+    { id: "attend", area: "people", name: "Attendance App", desc: "Staff clock in and out from a phone, with late and early tracking for managers.", fmt: "Web app", price: 59 },
+    { id: "training", area: "training", name: "Staff Onboarding Presentation", desc: "Welcome deck for new hires: standards, uniform, hygiene and service basics.", fmt: "PowerPoint", price: 39 },
+    { id: "fohman", area: "manuals", name: "FOH Manual", desc: "Complete front of house manual: roles, service sequence, standards, guest complaints and checklists.", fmt: "Word + PDF", price: 39 },
+    { id: "bohman", area: "manuals", name: "BOH Manual", desc: "Complete kitchen manual: stations, prep, receiving, storage, hygiene and shift routines.", fmt: "Word + PDF", price: 39 },
+    { id: "delivery", area: "manuals", name: "Delivery Operations System", desc: "Order intake, packing check, rider dispatch, time targets and a complaints log.", fmt: "Excel", price: 39 },
+    { id: "fire", area: "training", name: "Fire Safety Training", desc: "Fire prevention, the RACE response, extinguisher use and evacuation, with a drill record.", fmt: "PowerPoint", price: 29 },
+    { id: "finedine", area: "training", name: "Fine Dining Service Steps", desc: "The full service sequence from greeting to farewell, with table set-up and guest language.", fmt: "PowerPoint", price: 35 },
+    { id: "fohtr", area: "training", name: "FOH Training Programme", desc: "Full floor team training: roles, table service, upselling and guest recovery.", fmt: "PowerPoint", price: 35 },
+    { id: "bohtr", area: "training", name: "BOH Training Programme", desc: "Full kitchen team training: stations, knife and heat safety, prep and plating.", fmt: "PowerPoint", price: 35 },
+    { id: "hygiene", area: "training", name: "Basic Food Hygiene Training", desc: "Personal hygiene, handwashing, cross-contamination, temperatures and cleaning, with a quiz.", fmt: "PowerPoint", price: 29 },
+    { id: "listen", area: "training", name: "Listening Skills Training", desc: "Active listening with guests and teams, with role-play exercises.", fmt: "PowerPoint", price: 25 },
+    { id: "phone", area: "training", name: "Phone Selling Skills", desc: "Answering, taking reservations, suggestive selling and handling difficult calls, with scripts.", fmt: "PowerPoint", price: 25 },
+    { id: "pl", area: "training", name: "P&L Skills Training", desc: "Read a profit and loss statement and control food, beverage, labour and other costs.", fmt: "PowerPoint", price: 35 },
+    { id: "purch", area: "training", name: "Purchasing Training", desc: "Specifications, supplier quotes, receiving checks and price control.", fmt: "PowerPoint", price: 29 },
+    { id: "menutr", area: "training", name: "Menu Training", desc: "Know the menu: ingredients, allergens, selling points and tasting sessions.", fmt: "PowerPoint", price: 29 },
+    { id: "reserv", area: "foh", name: "Reservation Sheets", desc: "Daily bookings by time and table, covers, special requests and no-show notes.", fmt: "Excel + PDF", price: 19 },
+    { id: "clean", area: "safety", name: "Cleaning Schedules", desc: "Daily and weekly cleaning rosters for kitchen, floor, bar and washrooms, with sign-off lines.", fmt: "Excel + PDF", price: 22 },
+    { id: "deep", area: "safety", name: "Deep Cleaning Schedules", desc: "Monthly and quarterly deep cleans for hoods, ovens, chillers and drains, with last-done and next-due dates.", fmt: "Excel + PDF", price: 25 },
+    { id: "wash", area: "safety", name: "Food Washing Process", desc: "Step-by-step produce washing procedure with a wash log and a sanitiser check line.", fmt: "Word + Excel", price: 19 },
+    { id: "safety", area: "safety", name: "Food Safety Sheets", desc: "Temperature logs, delivery checks, date labelling and corrective action records.", fmt: "Excel + PDF", price: 29 },
+    { id: "sopbar", area: "sops", name: "Bartender SOPs", desc: "Opening, pouring standards, garnish prep, service and closing steps for the bar.", fmt: "Word + PDF", price: 29 },
+    { id: "sopkit", area: "sops", name: "Kitchen SOPs", desc: "Prep, cooking, holding, cooling and handover procedures for each kitchen station.", fmt: "Word + PDF", price: 35 },
+    { id: "sopbar2", area: "sops", name: "Barista SOPs", desc: "Espresso dialling, milk steaming, machine cleaning, and café opening and closing.", fmt: "Word + PDF", price: 29 },
+    { id: "cash", area: "money", name: "Cash Drawer Closing Sheet", desc: "Count by denomination, compare to the POS, record over and short, and sign off by two people.", fmt: "Excel + PDF", price: 15 },
+    { id: "tips", area: "money", name: "Tip Distribution System", desc: "Daily and monthly tip pool with split rules by role and hours, and a signed payout sheet.", fmt: "Excel", price: 25 },
+    { id: "supplier", area: "money", name: "Supplier Sheet", desc: "Supplier contacts, items, prices, lead times and delivery days, ready for ordering.", fmt: "Excel", price: 19 }
+  ];
+  var cart = {};
+  var $ = function (id) { return document.getElementById(id); };
+  var money = function (n) { return "$" + (Math.round(n * 100) / 100).toLocaleString("en-US", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }); };
+  function byId(id) { return ITEMS.filter(function (i) { return i.id === id; })[0]; }
+
+  /* Ticket */
+  var tItems = [
+    ["Walk-in chiller reads 0 to 4 °C, logged", true], ["Freezer reads −18 °C or colder, logged", true],
+    ["Hand-wash stations stocked", true], ["Sanitiser test strip at 200 ppm", false],
+    ["Cash float counted and signed", false], ["Section set-up photographed", false], ["Pre-shift briefing held", false]
+  ];
+  var tList = $("tList");
+  tItems.forEach(function (it, i) {
+    var li = document.createElement("li");
+    li.innerHTML = '<label><input type="checkbox" id="t' + i + '"' + (it[1] ? " checked" : "") + '><span>' + it[0] + '</span></label>';
+    tList.appendChild(li);
+  });
+  function tUpdate() {
+    var boxes = tList.querySelectorAll("input"), done = 0;
+    boxes.forEach(function (b) { if (b.checked) done++; });
+    $("tCount").textContent = done + " / " + boxes.length;
+    $("tBar").style.width = (done / boxes.length * 100) + "%";
+  }
+  tList.addEventListener("change", tUpdate); tUpdate();
+  try { $("tDate").textContent = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }); } catch (e) {}
+
+  /* Catalogue */
+  var filter = "all";
+  var filters = $("filters");
+  function drawFilters() {
+    filters.innerHTML = "";
+    [["all", "All systems"]].concat(Object.keys(AREAS).map(function (k) { return [k, AREAS[k]]; })).forEach(function (f) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "chip"; b.textContent = f[1];
+      b.setAttribute("aria-pressed", filter === f[0] ? "true" : "false");
+      b.addEventListener("click", function () { filter = f[0]; drawFilters(); drawCatalog(); });
+      filters.appendChild(b);
+    });
+  }
+  function drawCatalog() {
+    var el = $("catalog"); el.innerHTML = "";
+    ITEMS.filter(function (i) { return filter === "all" || i.area === filter; }).forEach(function (i) {
+      var on = !!cart[i.id];
+      var c = document.createElement("article");
+      c.className = "card" + (on ? " on" : "");
+      c.innerHTML =
+        '<div class="thumb ' + kindOf(i.fmt) + '"><div class="paper"><b>' + i.name + '</b><i></i></div></div>' +
+        '<span class="tag"><svg width="18" height="18"><use href="#i-' + i.area + '"/></svg>' + AREAS[i.area] + '</span>' +
+        '<h3>' + i.name + '</h3><p>' + i.desc + '</p>' +
+        '<div class="card-foot"><div><span class="price">' + money(i.price) + '</span><span class="fmt">' + i.fmt + '</span></div>' +
+        '<button type="button" class="btn small' + (on ? "" : " primary") + '" data-id="' + i.id + '" aria-pressed="' + on + '">' + (on ? "Added ✓" : "Add to order") + '</button></div>';
+      el.appendChild(c);
+    });
+  }
+  $("catalog").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-id]"); if (!b) return;
+    toggle(b.getAttribute("data-id"));
+  });
+  function toggle(id) { if (cart[id]) delete cart[id]; else cart[id] = true; drawCatalog(); drawOrder(); }
+
+  /* Order */
+  function pct(n) { return n >= 28 ? 35 : n >= 18 ? 30 : n >= 10 ? 25 : n >= 6 ? 15 : n >= 3 ? 10 : 0; }
+  function drawOrder() {
+    var ids = ITEMS.filter(function (i) { return cart[i.id]; });
+    var n = ids.length, sub = ids.reduce(function (s, i) { return s + i.price; }, 0);
+    var p = pct(n), disc = sub * p / 100, total = sub - disc;
+    $("cartCount").textContent = n;
+    var lines = $("lines"); lines.innerHTML = "";
+    if (!n) { lines.innerHTML = '<li class="empty">No systems chosen yet. Add some from the catalogue.</li>'; }
+    ids.forEach(function (i) {
+      var li = document.createElement("li");
+      li.innerHTML = '<span>' + i.name + ' <button type="button" data-rm="' + i.id + '" aria-label="Remove ' + i.name + '">remove</button></span><span>' + money(i.price) + '</span>';
+      lines.appendChild(li);
+    });
+    $("sSub").textContent = money(sub);
+    $("sDiscLabel").textContent = p ? "Volume discount (" + p + "%)" : "Volume discount";
+    $("sDisc").textContent = "−" + money(disc);
+    $("sTotal").textContent = money(total);
+    var next = n < 3 ? 3 : n < 6 ? 6 : n < 10 ? 10 : n < 18 ? 18 : n < 28 ? 28 : 0;
+    $("nudge").textContent = next ? "Add " + (next - n) + " more for " + pct(next) + "% off." : "Best volume discount applied.";
+    buildSummary(ids, sub, p, disc, total);
+  }
+  $("lines").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-rm]"); if (b) toggle(b.getAttribute("data-rm"));
+  });
+  function buildSummary(ids, sub, p, disc, total) {
+    var t = "ORDER: Soueidy Hospitality Systems\n";
+    t += "Name: " + $("f-name").value.trim() + "\nProperty: " + $("f-co").value.trim() + "\nCountry: " + $("f-country").value.trim() + "\n\n";
+    if (!ids.length) t += "(no systems chosen)\n";
+    ids.forEach(function (i) { t += "- " + i.name + "  " + money(i.price) + "\n"; });
+    t += "\nSubtotal: " + money(sub) + "\nDiscount (" + p + "%): -" + money(disc) + "\nTOTAL (USD): " + money(total) + "\n\nPaid by Wish Money to 70102357. Receipt screenshot attached.";
+    $("summary").value = t;
+  }
+  ["f-name", "f-co", "f-country"].forEach(function (id) {
+    $(id).addEventListener("input", function () { drawOrder(); });
+  });
+
+  /* Copy helpers */
+  function copyText(text, onOk, fallbackEl) {
+    function fallback() {
+      try { if (fallbackEl) { fallbackEl.select(); document.execCommand && document.execCommand("copy"); onOk(); } } catch (e) {}
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(onOk, fallback);
+      } else fallback();
+    } catch (e) { fallback(); }
+  }
+  function flash(btn, label) {
+    var old = btn.getAttribute("data-label") || btn.textContent;
+    btn.setAttribute("data-label", old); btn.textContent = label;
+    setTimeout(function () { btn.textContent = old; }, 1600);
+  }
+  $("copySummary").addEventListener("click", function () {
+    copyText($("summary").value, function () { var m = $("copiedMsg"); m.hidden = false; setTimeout(function () { m.hidden = true; }, 1800); }, $("summary"));
+  });
+  $("copyWish").addEventListener("click", function () { var b = this; copyText("70102357", function () { flash(b, "Copied"); }); });
+  $("copyMail").addEventListener("click", function () { var b = this; copyText("Edysoueidy68@gmail.com", function () { flash(b, "Copied"); }); });
+  $("copyMail2").addEventListener("click", function () { var b = this; copyText("Edysoueidy68@gmail.com", function () { flash(b, "Copied"); }); });
+
+  /* Sheet preview */
+  var SHEETS = {
+    "Waste log": { head: ["Date", "Item", "Qty", "Unit", "Reason", "Cost", "Initials"], rows: [
+      ["12 Oct", "Grilled chicken", "1.8", "kg", "Over-production", "$10.80", "RK"],
+      ["12 Oct", "Mixed salad", "0.9", "kg", "Past shelf life", "$3.60", "LM"],
+      ["13 Oct", "Flatbread", "14", "pcs", "Dropped", "$2.80", "RK"],
+      ["13 Oct", "Yoghurt sauce", "1.2", "L", "Prep error", "$2.40", "SA"] ], num: [2, 5] },
+    "Staff meal": { head: ["Date", "Meal", "Portions", "Cost / portion", "Total", "Budget", "Variance"], rows: [
+      ["Mon", "Rice and chicken", "24", "$1.20", "$28.80", "$30.00", "−$1.20"],
+      ["Tue", "Lentil soup, bread", "22", "$0.85", "$18.70", "$25.00", "−$6.30"],
+      ["Wed", "Pasta, salad", "26", "$1.10", "$28.60", "$30.00", "−$1.40"] ], num: [2, 3, 4, 5, 6] },
+    "Schedule": { head: ["Staff", "Role", "Mon", "Tue", "Wed", "Thu", "Fri", "Hours"], rows: [
+      ["Staff A", "Waiter", "10–18", "10–18", "Off", "16–24", "16–24", "40"],
+      ["Staff B", "Cook", "06–14", "06–14", "06–14", "Off", "14–22", "40"],
+      ["Staff C", "Runner", "Off", "16–24", "16–24", "16–24", "16–24", "32"] ], num: [7] },
+    "Cash drawer": { head: ["Line", "Count", "Amount"], rows: [
+      ["$100 notes", "3", "$300.00"], ["$50 notes", "4", "$200.00"], ["$20 notes", "10", "$200.00"],
+      ["$10 notes", "6", "$60.00"], ["$5 notes", "8", "$40.00"], ["$1 notes", "15", "$15.00"],
+      ["Total counted", "", "$815.00"], ["POS cash sales", "", "$812.00"], ["Over / short", "", "+$3.00"] ], num: [1, 2] },
+    "Tip split": { head: ["Group", "Rule", "Share", "Amount"], rows: [
+      ["Waiters (3)", "By hours worked", "60%", "$288.00"], ["Runners (2)", "Equal", "20%", "$96.00"],
+      ["Kitchen crew", "Equal", "15%", "$72.00"], ["Cleaning team", "Equal", "5%", "$24.00"], ["Pool", "", "100%", "$480.00"] ], num: [2, 3] },
+    "Cleaning": { head: ["Area", "Task", "Freq.", "Mon", "Tue", "Wed", "Thu", "Fri", "By"], rows: [
+      ["Kitchen", "Wipe prep surfaces", "Daily", "✓", "✓", "✓", "✓", "", "RK"],
+      ["Floor", "Mop and sanitise", "Daily", "✓", "✓", "✓", "✓", "", "LM"],
+      ["Bar", "Clean ice well", "Daily", "✓", "✓", "✓", "", "", "SA"],
+      ["Washroom", "Check and restock", "2 hourly", "✓", "✓", "✓", "✓", "", "LM"] ], num: [] },
+    "Deep clean": { head: ["Equipment", "Task", "Freq.", "Last done", "Next due", "Signed"], rows: [
+      ["Hood filters", "Soak and degrease", "Monthly", "02 Oct", "02 Nov", "RK"],
+      ["Walk-in chiller", "Empty, wash, sanitise", "Monthly", "28 Sep", "28 Oct", "SA"],
+      ["Floor drains", "Scrub and flush", "Weekly", "11 Oct", "18 Oct", "LM"],
+      ["Oven", "Strip clean", "Monthly", "05 Oct", "05 Nov", "RK"] ], num: [] },
+    "Reservations": { head: ["Time", "Name", "Covers", "Table", "Notes"], rows: [
+      ["19:00", "Guest A", "4", "T12", "Birthday, cake at dessert"], ["19:30", "Guest B", "2", "T04", "Window seat"],
+      ["20:00", "Guest C", "8", "T20", "Set menu, one vegetarian"], ["20:30", "Guest D", "3", "T07", "High chair"] ], num: [2] },
+    "Suppliers": { head: ["Supplier", "Category", "Delivery days", "Lead time", "Terms"], rows: [
+      ["Supplier A", "Produce", "Mon, Thu", "1 day", "15 days"], ["Supplier B", "Meat and poultry", "Tue, Fri", "2 days", "30 days"],
+      ["Supplier C", "Dry goods", "Wed", "3 days", "30 days"], ["Supplier D", "Beverages", "Mon", "2 days", "Cash on delivery"] ], num: [] },
+    "Food washing": { head: ["Date", "Product", "Wash step", "Sanitiser check", "Rinse", "Initials"], rows: [
+      ["14 Oct", "Lettuce", "Rinse, soak, drain", "Strip checked", "Potable water", "RK"],
+      ["14 Oct", "Herbs", "Rinse, soak, drain", "Strip checked", "Potable water", "SA"],
+      ["14 Oct", "Tomatoes", "Rinse and dry", "Not needed", "Potable water", "LM"] ], num: [] },
+    "Temperature": { head: ["Time", "Unit", "Reading", "Limit", "Status", "Initials"], rows: [
+      ["07:30", "Chiller 1", "3.2 °C", "0 to 4 °C", "OK", "RK"], ["07:32", "Freezer 1", "−19.0 °C", "−18 °C or colder", "OK", "RK"],
+      ["07:35", "Chiller 2", "5.6 °C", "0 to 4 °C", "Action: stock moved", "RK"] ], num: [2] }
+  };
+  var tabsEl = $("tabs"), cur = "Waste log";
+  function drawSheet() {
+    tabsEl.innerHTML = "";
+    Object.keys(SHEETS).forEach(function (k) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "tab"; b.setAttribute("role", "tab"); b.textContent = k;
+      b.setAttribute("aria-selected", k === cur ? "true" : "false");
+      b.addEventListener("click", function () { cur = k; drawSheet(); });
+      tabsEl.appendChild(b);
+    });
+    var s = SHEETS[cur];
+    var h = "<table><thead><tr>" + s.head.map(function (x) { return "<th>" + x + "</th>"; }).join("") + "</tr></thead><tbody>";
+    s.rows.forEach(function (r) {
+      h += "<tr>" + r.map(function (c, i) { return '<td' + (s.num.indexOf(i) > -1 ? ' class="num"' : "") + ">" + c + "</td>"; }).join("") + "</tr>";
+    });
+    $("sheet").innerHTML = h + "</tbody></table>";
+  }
+
+  /* Variance */
+  function calc() {
+    var g = function (id) { var v = parseFloat($(id).value); return isFinite(v) ? v : 0; };
+    var act = g("v-open") + g("v-buy") - g("v-close"), theo = g("v-theo"), v = act - theo;
+    var pc = theo ? v / theo * 100 : 0, cost = v * g("v-cost");
+    $("r-act").textContent = act.toFixed(1) + " kg";
+    $("r-var").textContent = (v > 0 ? "+" : "") + v.toFixed(1) + " kg";
+    $("r-cost").textContent = (cost < 0 ? "−" : "") + "$" + Math.abs(cost).toFixed(2);
+    var s = $("r-status"), a = Math.abs(pc);
+    var cls = a <= 2 ? "ok" : a <= 5 ? "warn" : "bad";
+    s.className = "status " + cls;
+    s.textContent = (cls === "ok" ? "On target" : cls === "warn" ? "Review" : "Investigate") + " · " + (pc > 0 ? "+" : "") + pc.toFixed(1) + "%";
+  }
+  ["v-open", "v-buy", "v-close", "v-theo", "v-cost"].forEach(function (id) { $(id).addEventListener("input", calc); });
+
+  /* Cash drawer */
+  var DEN = [100, 50, 20, 10, 5, 1];
+  function usd(n) { return (n < 0 ? "−" : "") + "$" + Math.abs(n).toFixed(2); }
+  function cash() {
+    var tot = 0;
+    DEN.forEach(function (d) { var v = parseFloat($("c-" + d).value); tot += (isFinite(v) ? v : 0) * d; });
+    var pos = parseFloat($("c-pos").value); pos = isFinite(pos) ? pos : 0;
+    var diff = tot - pos;
+    $("c-total").textContent = usd(tot); $("c-posout").textContent = usd(pos);
+    $("c-diff").textContent = (diff > 0 ? "+" : "") + usd(diff);
+    var s = $("c-status"), a = Math.abs(diff);
+    s.className = "status " + (a < 0.005 ? "ok" : a <= 5 ? "warn" : "bad");
+    s.textContent = a < 0.005 ? "Balanced" : (diff > 0 ? "Over by " : "Short by ") + usd(a) + (a <= 5 ? " · recount" : " · investigate");
+  }
+  DEN.map(function (d) { return "c-" + d; }).concat(["c-pos"]).forEach(function (id) { $(id).addEventListener("input", cash); });
+
+  /* Tips */
+  var TIPG = ["Waiters", "Runners", "Kitchen crew", "Cleaning team"];
+  function tips() {
+    var pool = parseFloat($("tip-pool").value); pool = isFinite(pool) ? pool : 0;
+    var sum = 0, html = "";
+    TIPG.forEach(function (g, i) {
+      var p = parseFloat($("tip-" + (i + 1)).value); p = isFinite(p) ? p : 0; sum += p;
+      html += "<tr><td>" + g + "</td><td class=\"num\">" + p + "%</td><td class=\"num\"><b>" + usd(pool * p / 100) + "</b></td></tr>";
+    });
+    $("tip-out").innerHTML = html;
+    var s = $("tip-status"), ok = Math.abs(sum - 100) < 0.005;
+    s.className = "status " + (ok ? "ok" : "bad");
+    s.textContent = ok ? "Shares add to 100" : "Shares add to " + sum + ", fix to 100";
+  }
+  ["tip-pool", "tip-1", "tip-2", "tip-3", "tip-4"].forEach(function (id) { $(id).addEventListener("input", tips); });
+
+  /* Temperature log */
+  var tpN = 0;
+  $("tp-add").addEventListener("click", function () {
+    var unit = $("tp-unit").value, v = parseFloat($("tp-val").value);
+    if (!isFinite(v)) return;
+    var ok = unit === "chiller" ? (v >= 0 && v <= 4) : v <= -18;
+    var tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + (unit === "chiller" ? "Chiller" : "Freezer") + " " + (++tpN) + "</td><td>" + v.toFixed(1) + " °C</td><td class=\"" + (ok ? "ok" : "bad") + "\">" + (ok ? "OK" : "Action needed") + "</td>";
+    $("tp-rows").insertBefore(tr, $("tp-rows").firstChild);
+  });
+  $("tp-unit").addEventListener("change", function () { $("tp-val").value = this.value === "chiller" ? "3.2" : "-19.0"; });
+  $("tp-val").value = "3.2"; $("tp-add").click(); $("tp-val").value = "6.1"; $("tp-add").click(); $("tp-val").value = "3.2";
+
+  drawFilters(); drawCatalog(); drawOrder(); drawSheet(); calc(); cash(); tips();
+})();
+</script>
+
+</body></html>
